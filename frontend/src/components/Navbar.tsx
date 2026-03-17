@@ -13,9 +13,9 @@ const Navbar = () => {
   };
 
   const isActive = (path: string) =>
-    location.pathname === path
-      ? "bg-blue-600 text-white px-4 py-2 rounded-lg"
-      : "text-gray-700 hover:text-blue-600";
+  location.pathname === path
+    ? "bg-blue-700 text-white px-4 py-2 rounded-lg"
+    : "bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition";
 
   return (
     <nav className="border-b bg-white sticky top-0 z-50 shadow-sm">

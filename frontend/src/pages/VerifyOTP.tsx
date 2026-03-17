@@ -1,14 +1,22 @@
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import API from "../services/api";
 import toast from "react-hot-toast";
 
 const VerifyOTP = () => {
     const navigate = useNavigate();
-    const email = localStorage.getItem("email");
+    const location = useLocation();
+    const email = location.state?.email;
 
     const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
     const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+
+    // ✅ redirect if no email
+    useEffect(() => {
+        if (!email) {
+            navigate("/register");
+        }
+    }, [email]);
 
     const handleChange = (value: string, index: number) => {
         if (!/^[0-9]?$/.test(value)) return;
@@ -17,7 +25,6 @@ const VerifyOTP = () => {
         newOtp[index] = value;
         setOtp(newOtp);
 
-        // move next
         if (value && index < 5) {
             inputsRef.current[index + 1]?.focus();
         }
@@ -35,9 +42,7 @@ const VerifyOTP = () => {
         }
     };
 
-    // ✅ NEW: HANDLE CHANGE EMAIL
     const handleChangeEmail = () => {
-        // keep registerData (already saved)
         navigate("/register");
     };
 
@@ -56,9 +61,7 @@ const VerifyOTP = () => {
 
             toast.success("Account verified ✅");
 
-            // cleanup
-            localStorage.removeItem("email");
-            localStorage.removeItem("registerData"); // optional reset
+            // ❌ removed localStorage cleanup
 
             navigate("/login");
 
@@ -80,7 +83,6 @@ const VerifyOTP = () => {
                     OTP sent to <b>{email}</b>
                 </p>
 
-                {/* OTP INPUTS */}
                 <div className="flex justify-center gap-3 mb-6">
 
                     {otp.map((digit, i) => (
@@ -107,7 +109,6 @@ const VerifyOTP = () => {
                     Enter the Experience
                 </button>
 
-                {/* ✅ FIXED BUTTON */}
                 <p
                     onClick={handleChangeEmail}
                     className="text-sm text-gray-400 mt-4 cursor-pointer hover:text-black"

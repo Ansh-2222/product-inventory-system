@@ -13,7 +13,7 @@ const Register = () => {
     password: "",
   });
 
-  // ✅ LOAD PREVIOUS DATA
+  // ✅ LOAD PREVIOUS DATA (unchanged)
   useEffect(() => {
     const saved = localStorage.getItem("registerData");
     if (saved) {
@@ -23,15 +23,17 @@ const Register = () => {
 
   const handleRegister = async () => {
     try {
-      // ✅ SAVE FULL FORM
+      // ✅ KEEP THIS (your existing logic)
       localStorage.setItem("registerData", JSON.stringify(form));
-      localStorage.setItem("email", form.email);
+
+      // ❌ REMOVED: localStorage.setItem("email", form.email);
 
       await API.post("/auth/register", form);
 
       toast.success("OTP sent to email 📩");
 
-      navigate("/verify-otp");
+      // ✅ FIX: pass email via navigation state
+      navigate("/verify-otp", { state: { email: form.email } });
 
     } catch (err: any) {
       toast.error(err.response?.data?.message);
@@ -74,7 +76,7 @@ const Register = () => {
 
           <button
             onClick={handleRegister}
-            className="w-full bg-black text-white py-3 rounded-lg"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
           >
             Create Account
           </button>

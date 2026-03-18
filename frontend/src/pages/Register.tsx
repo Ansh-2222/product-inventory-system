@@ -13,7 +13,7 @@ const Register = () => {
     password: "",
   });
 
-  // ✅ LOAD PREVIOUS DATA (unchanged)
+  // LOAD PREVIOUS DATA (unchanged)
   useEffect(() => {
     const saved = localStorage.getItem("registerData");
     if (saved) {
@@ -23,16 +23,16 @@ const Register = () => {
 
   const handleRegister = async () => {
     try {
-      // ✅ KEEP THIS (your existing logic)
+      //  KEEP THIS (your existing logic)
       localStorage.setItem("registerData", JSON.stringify(form));
 
-      // ❌ REMOVED: localStorage.setItem("email", form.email);
+      //  REMOVED: localStorage.setItem("email", form.email);
 
       await API.post("/auth/register", form);
 
       toast.success("OTP sent to email 📩");
 
-      // ✅ FIX: pass email via navigation state
+      //  FIX: pass email via navigation state
       navigate("/verify-otp", { state: { email: form.email } });
 
     } catch (err: any) {

@@ -23,7 +23,7 @@ const Dashboard = () => {
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ Debounce search (VERY IMPORTANT)
+  //  Debounce search (VERY IMPORTANT)
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -53,7 +53,7 @@ const Dashboard = () => {
   const addProduct = async (data: Omit<Product, "id">) => {
     try {
       await API.post("/products", data);
-      toast.success("Product added ✅");
+      toast.success("Product added ");
       fetchProducts();
     } catch {
       toast.error("Failed to add product");
@@ -102,7 +102,7 @@ const Dashboard = () => {
           <div className="text-center py-10">Loading...</div>
         ) : products.length === 0 ? (
           <div className="text-center py-10 text-gray-500">
-            No products found 📦
+            No products found 
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">

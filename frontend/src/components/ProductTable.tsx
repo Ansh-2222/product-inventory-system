@@ -49,7 +49,7 @@ const ProductTable = ({ products, onDelete, onEdit, loading }: Props) => {
           ) : products.length === 0 ? (
             <tr>
               <td colSpan={6} className="text-center py-6 text-gray-500">
-                No products found 📦
+                No products found 
               </td>
             </tr>
           ) : (

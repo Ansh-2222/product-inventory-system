@@ -23,9 +23,9 @@ const Login = () => {
 
       localStorage.setItem("token", res.data.token);
 
-      toast.success("Login successful 🎉");
+      toast.success("Login successful ");
 
-      navigate("/dashboard"); // ✅ better flow
+      navigate("/dashboard"); // better flow
 
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Login failed");

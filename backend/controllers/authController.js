@@ -14,7 +14,6 @@ import {
 } from "../utils/tempStore.js";
 
 
-// STEP 1: SEND OTP (NO DB SAVE)
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -31,7 +30,7 @@ export const register = async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // store temp user
+    
     saveTempUser(email, {
       name,
       email,
@@ -68,16 +67,16 @@ export const verifyOTP = async (req, res) => {
       });
     }
 
-    //  SAVE ONLY AFTER VERIFICATION
+    
     const user = await createUser(
       tempUser.name,
       tempUser.email,
       tempUser.passwordHash,
-      true,   //  email verified
-      false   // future phone verification
+      true,   
+      false  
     );
 
-    // delete temp data
+    
     deleteTempUser(email);
 
     const token = generateToken(user);
@@ -92,7 +91,7 @@ export const verifyOTP = async (req, res) => {
   }
 };
 
-// LOGIN USER
+
 export const login = async (req, res) => {
 
   try {

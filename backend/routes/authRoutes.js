@@ -9,7 +9,7 @@ import {
 const router = express.Router();
 
 router.post("/register", register);
-router.post("/verify-otp", verifyOTP); // NEW
+router.post("/verify-otp", verifyOTP); 
 router.post("/login", login);
 
 export default router;

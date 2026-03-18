@@ -11,7 +11,7 @@ const VerifyOTP = () => {
     const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
     const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
-    // ✅ redirect if no email
+    //  redirect if no email
     useEffect(() => {
         if (!email) {
             navigate("/register");
@@ -59,9 +59,9 @@ const VerifyOTP = () => {
                 otp: finalOtp,
             });
 
-            toast.success("Account verified ✅");
+            toast.success("Account verified ");
 
-            // ❌ removed localStorage cleanup
+            // removed localStorage cleanup
 
             navigate("/login");
 

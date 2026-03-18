@@ -39,7 +39,7 @@ const ProductDetails = () => {
 
   useEffect(() => {
     fetchProduct();
-  }, [id]); // ✅ FIXED (important)
+  }, [id]); //  FIXED (important)
 
   const deleteProduct = async () => {
     if (!confirm("Delete this product?")) return;
@@ -142,7 +142,7 @@ const ProductDetails = () => {
 
       </div>
 
-      {/* ✅ CORRECT PLACE */}
+      {/*  CORRECT PLACE */}
       {editProduct && (
         <EditModal
           product={editProduct}

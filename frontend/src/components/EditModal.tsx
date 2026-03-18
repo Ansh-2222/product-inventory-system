@@ -1,15 +1,6 @@
 import { useState, useEffect } from "react";
 import { categories } from "../constants/categories";
-
-type Product = {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  quantity: number;
-  description: string;
-};
-
+import type { Product } from "../types/product";
 type Props = {
   product: Product | null;
   onClose: () => void;

@@ -8,15 +8,8 @@ import EditModal from "../components/EditModal";
 import { categories } from "../constants/categories";
 import toast from "react-hot-toast";
 import { Package, AlertTriangle, Layers, Search } from "lucide-react";
+import type { Product } from "../types/product";
 
-type Product = {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  quantity: number;
-  description?: string; // ✅ FIXED
-};
 
 const Dashboard = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -31,7 +24,14 @@ const Dashboard = () => {
       const res = await API.get(
         `/products?search=${search}&category=${category}`
       );
-      setProducts(res.data);
+
+      const normalized = res.data.map((p: any) => ({
+        ...p,
+        description: p.description || ""
+      }));
+
+      setProducts(normalized);
+
     } catch {
       toast.error("Failed to fetch products");
     } finally {
@@ -151,8 +151,12 @@ const Dashboard = () => {
         <ProductTable
           products={products}
           onDelete={deleteProduct}
-          onEdit={(p) => setEditProduct(p)}
-          loading={loading}
+          onEdit={(p) =>
+            setEditProduct({
+              ...p,
+              description: p.description || ""
+            })
+          } loading={loading}
         />
 
       </div>

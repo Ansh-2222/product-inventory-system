@@ -10,11 +10,14 @@ const pool = new pg.Pool({
   },
 });
 
-// ✅ AUTO CREATE TABLES (BASED ON YOUR CODE)
-const createTables = async () => {
+// ✅ CREATE TABLES AFTER CONNECTION
+const initDB = async () => {
   try {
-    // 🔹 USERS TABLE (MATCHING YOUR CODE)
-    await pool.query(`
+    const client = await pool.connect();
+    console.log("PostgreSQL Connected ✅");
+
+    // USERS TABLE
+    await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
@@ -27,8 +30,8 @@ const createTables = async () => {
       );
     `);
 
-    // 🔹 PRODUCTS TABLE
-    await pool.query(`
+    // PRODUCTS TABLE
+    await client.query(`
       CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
@@ -41,13 +44,14 @@ const createTables = async () => {
       );
     `);
 
-    console.log("Tables ready ✅");
+    console.log("Tables ready ");
+
+    client.release();
   } catch (err) {
-    console.error("Error creating tables ❌", err);
+    console.error("DB INIT ERROR ", err);
   }
 };
 
-// 🔥 RUN ON START
-createTables();
+initDB();
 
 export default pool;

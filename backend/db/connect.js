@@ -10,13 +10,44 @@ const pool = new pg.Pool({
   },
 });
 
-pool.connect()
-  .then((client) => {
-    console.log("PostgreSQL Connected ");
-    client.release();
-  })
-  .catch((err) => {
-    console.error("Database connection error :", err);
-  });
+// ✅ AUTO CREATE TABLES (BASED ON YOUR CODE)
+const createTables = async () => {
+  try {
+    // 🔹 USERS TABLE (MATCHING YOUR CODE)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        email_verified BOOLEAN DEFAULT false,
+        phone_verified BOOLEAN DEFAULT false,
+        email_verification_token TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // 🔹 PRODUCTS TABLE
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS products (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        category TEXT,
+        price INTEGER,
+        quantity INTEGER,
+        description TEXT,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    console.log("Tables ready ✅");
+  } catch (err) {
+    console.error("Error creating tables ❌", err);
+  }
+};
+
+// 🔥 RUN ON START
+createTables();
 
 export default pool;

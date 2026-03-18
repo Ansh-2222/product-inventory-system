@@ -1,49 +1,54 @@
-import pg from "pg";
-import dotenv from "dotenv";
+import pool from "../db/connect.js";
 
-dotenv.config();
+export const createUser = async (
+  name,
+  email,
+  passwordHash,
+  emailVerified = false,
+  phoneVerified = false
+) => {
 
-const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
+  const result = await pool.query(
+    `INSERT INTO users
+    (name, email, password_hash, email_verified, phone_verified)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *`,
+    [name, email, passwordHash, emailVerified, phoneVerified]
+  );
 
-const createTables = async () => {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL,
-        email_verified BOOLEAN DEFAULT false,
-        phone_verified BOOLEAN DEFAULT false,
-        email_verification_token TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS products (
-        id SERIAL PRIMARY KEY,
-        name TEXT NOT NULL,
-        category TEXT,
-        price INTEGER,
-        quantity INTEGER,
-        description TEXT,
-        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    console.log("Tables ready ");
-  } catch (err) {
-    console.error("Error creating tables ", err);
-  }
+  return result.rows[0];
 };
 
-createTables();
+export const findUserByEmail = async (email) => {
 
-export default pool;
+  const result = await pool.query(
+    "SELECT * FROM users WHERE email=$1",
+    [email]
+  );
+
+  return result.rows[0];
+};
+
+export const findUserByVerificationToken = async (token) => {
+
+  const result = await pool.query(
+    "SELECT * FROM users WHERE email_verification_token=$1",
+    [token]
+  );
+
+  return result.rows[0];
+};
+
+export const verifyUserEmail = async (token) => {
+
+  const result = await pool.query(
+    `UPDATE users
+     SET email_verified=true,
+         email_verification_token=NULL
+     WHERE email_verification_token=$1
+     RETURNING *`,
+    [token]
+  );
+
+  return result.rows[0];
+};

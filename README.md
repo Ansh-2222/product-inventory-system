@@ -1,24 +1,41 @@
-# 🚀 Works Mentor – Product Inventory Management System
+# Product Inventory Management System
 
-A full-stack **Product Inventory Management System** built with modern technologies, featuring authentication, OTP verification, and a clean, responsive UI.
+A full-stack Product inventory management application with authentication, OTP verification, and product CRUD operations.
 
 ---
 
 ## 📌 Overview
 
-Works Mentor is a scalable web application that enables users to efficiently manage products with a seamless and secure experience.
+This project allows users to:
 
-Users can:
-
-* Register with OTP-based email verification 📩
-* Login securely using JWT 🔐
-* Add, update, and delete products 🛒
+* Register with OTP verification 📩
+* Login securely 🔐
+* Add, edit, delete products 🛒
 * Search and filter products 🔍
-* View detailed product information 📄
-
-This project demonstrates **end-to-end full-stack development**, clean architecture, and real-world UX patterns.
+* View product details 📄
+* Track inventory analytics 📊
 
 ---
+## 🌐 Deployment
+
+The application is fully deployed:
+
+* 🔹 **Frontend:** Vercel
+* 🔹 **Backend + Database:** Render
+
+### ⚠️ Important Note (Render Cold Start)
+
+The backend is hosted on Render’s free tier, which may go to sleep after inactivity.
+
+👉 When you open the app for the first time:
+
+* The backend may take **30–60 seconds to wake up**
+* During this time, API requests might feel slow
+
+⏳ Please wait a moment — after waking up, the app works smoothly.
+
+---
+
 
 ## 🛠️ Tech Stack
 
@@ -28,6 +45,7 @@ This project demonstrates **end-to-end full-stack development**, clean architect
 * TypeScript
 * Tailwind CSS
 * React Router DOM
+* Axios
 * React Hot Toast
 
 ### 🔹 Backend
@@ -39,55 +57,20 @@ This project demonstrates **end-to-end full-stack development**, clean architect
 
 * PostgreSQL
 
-### 🔹 Tools & Utilities
-
-* Axios
-* JWT Authentication
-* OTP Email Service (Resend/Nodemailer)
-
----
-
-## ✨ Features
-
-### 🔐 Authentication
-
-* User registration with OTP verification
-* Secure login using JWT tokens
-* Protected routes for authorized access
-
-### 📦 Product Management
-
-* Add new products
-* Edit existing products
-* Delete products with confirmation
-* View product details on a dedicated page
-
-### 🔍 Search & Filter
-
-* Search products by name
-* Filter products by category (dropdown)
-
-### 🎨 UI/UX
-
-* Clean and minimal design
-* Responsive across devices
-* Loading states & empty states
-* Toast notifications for feedback
-* Smooth OTP input experience
-
 ---
 
 ## 📂 Project Structure
 
 ```
-client/
+frontend/
   ├── src/
   │   ├── components/
   │   ├── pages/
   │   ├── services/
+  │   ├── types/
   │   └── utils/
 
-server/
+backend/
   ├── controllers/
   ├── routes/
   ├── middleware/
@@ -99,91 +82,175 @@ server/
 
 ## ⚙️ Installation & Setup
 
-### 1️⃣ Clone the Repository
+### 1️⃣ Clone Repository
 
-```
-git clone https://github.com/your-username/works-mentor.git
-cd works-mentor
+```bash
+git clone https://github.com/your-username/product-inventory-system.git
+cd product-inventory-system
 ```
 
 ---
 
-### 2️⃣ Backend Setup
+## 🔧 Backend Setup
 
-```
-cd server
+```bash
+cd backend
 npm install
 ```
 
-Create `.env` file:
+---
+
+### 🔐 Environment Variables
+
+Create a `.env` file inside `backend/`:
 
 ```
 PORT=5000
-DATABASE_URL=your_postgres_url
-JWT_SECRET=your_secret
-EMAIL_USER=your_email
-EMAIL_PASS=your_password
+JWT_SECRET=
+RESEND_API_KEY=
+DB_USER=postgres
+DB_PASSWORD=
+DB_HOST=localhost
+DB_PORT=5432
+DB_DATABASE=
+NODE_ENV=
+DATABASE_URL=
 ```
 
-Run server:
+---
 
+## 🗄️ Database Configuration (PostgreSQL)
+
+### 1️⃣ Create Database
+
+```sql
+CREATE DATABASE inventory_db;
 ```
+
+---
+
+### 2️⃣ Enable UUID Extension (Required)
+
+```sql
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+```
+
+---
+
+### 3️⃣ Create Tables
+
+#### 📦 Products Table
+
+```sql
+CREATE TABLE products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  category TEXT NOT NULL,
+  price NUMERIC NOT NULL,
+  quantity INTEGER NOT NULL,
+  description TEXT
+);
+```
+
+---
+
+#### 👤 Users Table
+
+```sql
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  email_verified BOOLEAN DEFAULT false,
+  phone_verified BOOLEAN DEFAULT false,
+  email_verification_token TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+## ▶️ Run Backend
+
+```bash
 npm run dev
 ```
 
 ---
 
-### 3️⃣ Frontend Setup
+## 💻 Frontend Setup
 
-```
-cd client
+```bash
+cd frontend
 npm install
 npm run dev
 ```
 
 ---
 
-## 🔐 Environment Variables
+## 🔐 Authentication Flow
 
-| Variable     | Description                  |
-| ------------ | ---------------------------- |
-| DATABASE_URL | PostgreSQL connection string |
-| JWT_SECRET   | Secret key for JWT           |
-| EMAIL_USER   | Email for sending OTP        |
-| EMAIL_PASS   | Email app password / API key |
+1. User registers → OTP sent to email
+2. User verifies OTP
+3. User logs in → JWT stored
+4. Protected routes enabled
+
+---
+
+## ✨ Features
+
+### 📦 Product Management
+
+* Add product
+* Edit product (modal)
+* Delete product
+* View details
+
+### 🔍 Search & Filter
+
+* Search by name
+* Filter by category
+
+### 📊 Dashboard
+
+* Total Inventory Value
+* Active Categories
+* Low Stock Alerts
 
 ---
 
 ## 📸 Screenshots
 
-* Landing Page
-* Login & OTP Verification
-* Dashboard (Product Cards)
-* Product Details Page
+* Dashboard
+<img width="1919" height="966" alt="image" src="https://github.com/user-attachments/assets/d9d0448f-77d5-48bb-beb7-ae896c2392d7" />
 
-*(Add screenshots here to boost portfolio impact)*
+* Product Table
+<img width="1204" height="411" alt="image" src="https://github.com/user-attachments/assets/9d039f8d-c0c0-4b85-9ffe-035c8480600c" />
+
+
+* Edit Modal
+<img width="1260" height="924" alt="image" src="https://github.com/user-attachments/assets/f9aeabd1-bffd-4575-9f6c-81fc5c8b8751" />
+
+* OTP Page
+
+  <img width="802" height="575" alt="image" src="https://github.com/user-attachments/assets/be1836cc-76e3-404c-a258-2bfe1cb8e57e" />
+
+
+
+---
+
+
+## 🧠 Learnings
+
+* Full-stack architecture
+* API design & integration
+* Authentication with JWT
+* OTP system implementation
+* TypeScript best practices
 
 ---
 
-## 🚀 Future Improvements
-
-* Pagination / Infinite scroll
-* Product image upload
-* Role-based access (Admin/User)
-* Dark mode 🌙
-* Analytics dashboard
-
----
-
-## 🧠 Key Learnings
-
-* Full-stack application architecture
-* OTP-based authentication flow
-* REST API design
-* State management in React
-* Building production-level UI/UX
-
----
 
 ## 👨‍💻 Author
 
@@ -192,4 +259,4 @@ B.Tech CSE | Full Stack Developer
 
 ---
 
-⭐ If you like this project, consider giving it a star!
+⭐ If you like this project, give it a star!

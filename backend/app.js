@@ -16,7 +16,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 
 
-// ✅ ADD THIS
 app.get("/test-db", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");

@@ -3,20 +3,21 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl: isProduction
+    ? { rejectUnauthorized: false } // ✅ Render
+    : false, // ❌ Local
 });
 
-// ✅ CREATE TABLES AFTER CONNECTION
+// INIT DB
 const initDB = async () => {
   try {
     const client = await pool.connect();
     console.log("PostgreSQL Connected ✅");
 
-    // USERS TABLE
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -30,7 +31,6 @@ const initDB = async () => {
       );
     `);
 
-    // PRODUCTS TABLE
     await client.query(`
       CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,
@@ -44,11 +44,11 @@ const initDB = async () => {
       );
     `);
 
-    console.log("Tables ready ");
+    console.log("Tables ready ✅");
 
     client.release();
   } catch (err) {
-    console.error("DB INIT ERROR ", err);
+    console.error("DB INIT ERROR ❌", err);
   }
 };
 

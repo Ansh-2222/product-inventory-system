@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import API from "../services/api";
 import Navbar from "../components/Navbar";
 import ProductForm from "../components/ProductForm";
-import ProductCard from "../components/ProductCard";
+import ProductTable from "../components/ProductTable";
+import EditModal from "../components/EditModal";
 import { categories } from "../constants/categories";
 import toast from "react-hot-toast";
+import { Package, AlertTriangle, Layers, Search } from "lucide-react";
 
 type Product = {
   id: string;
@@ -13,30 +15,21 @@ type Product = {
   category: string;
   price: number;
   quantity: number;
-  description: string;
+  description?: string; // ✅ FIXED
 };
 
 const Dashboard = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
-
-  //  Debounce search (VERY IMPORTANT)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [search]);
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const res = await API.get(
-        `/products?search=${debouncedSearch}&category=${category}`
+        `/products?search=${search}&category=${category}`
       );
       setProducts(res.data);
     } catch {
@@ -48,71 +41,131 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [debouncedSearch, category]);
+  }, [search, category]);
 
-  const addProduct = async (data: Omit<Product, "id">) => {
+  const addProduct = async (data: any) => {
     try {
       await API.post("/products", data);
-      toast.success("Product added ");
+      toast.success("Product added");
       fetchProducts();
     } catch {
-      toast.error("Failed to add product");
+      toast.error("Add failed");
     }
   };
 
+  const deleteProduct = async (id: string) => {
+    if (!confirm("Delete this product?")) return;
+
+    try {
+      await API.delete(`/products/${id}`);
+      toast.success("Deleted");
+      fetchProducts();
+    } catch {
+      toast.error("Delete failed");
+    }
+  };
+
+  const updateProduct = async (data: Product) => {
+    try {
+      await API.put(`/products/${data.id}`, data);
+      toast.success("Updated");
+
+      setEditProduct(null);
+      fetchProducts();
+    } catch {
+      toast.error("Update failed");
+    }
+  };
+
+  // STATS
+  const totalValue = products.reduce(
+    (acc, p) => acc + p.price * p.quantity,
+    0
+  );
+
+  const activeCategories = new Set(products.map(p => p.category)).size;
+
+  const lowStock = products.filter(p => p.quantity < 10).length;
+
   return (
-    <div className="min-h-screen bg-blue-50">
+    <div className="min-h-screen bg-gray-100">
 
       <Navbar />
 
       <div className="max-w-6xl mx-auto px-4 py-6">
 
-        <h1 className="text-2xl font-semibold mb-4 text-gray-700">
-          Product Inventory
-        </h1>
+        {/* STATS */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
 
-        {/* SEARCH */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+          <div className="bg-white p-4 rounded-xl shadow flex items-center gap-3">
+            <Package className="text-blue-600" />
+            <div>
+              <p className="text-sm text-gray-500">Total Inventory Value</p>
+              <h2 className="font-semibold">₹{totalValue}</h2>
+            </div>
+          </div>
 
-          <input
-            placeholder="Search product..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-400"
-          />
+          <div className="bg-white p-4 rounded-xl shadow flex items-center gap-3">
+            <Layers className="text-green-600" />
+            <div>
+              <p className="text-sm text-gray-500">Active Categories</p>
+              <h2 className="font-semibold">{activeCategories}</h2>
+            </div>
+          </div>
+
+          <div className="bg-white p-4 rounded-xl shadow flex items-center gap-3">
+            <AlertTriangle className="text-red-500" />
+            <div>
+              <p className="text-sm text-gray-500">Low Stock</p>
+              <h2 className="font-semibold">{lowStock}</h2>
+            </div>
+          </div>
+
+        </div>
+
+        <ProductForm onAdd={addProduct} />
+
+        {/* SEARCH + FILTER */}
+        <div className="flex flex-col sm:flex-row gap-3 my-4">
+
+          <div className="relative w-full">
+            <Search className="absolute left-2 top-3 text-gray-400" size={18} />
+            <input
+              placeholder="Search..."
+              onChange={(e) => setSearch(e.target.value)}
+              className="border pl-8 p-2 rounded w-full focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
 
           <select
-            value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-400"
+            className="border p-2 rounded w-full sm:w-60 focus:ring-2 focus:ring-blue-400"
           >
             <option value="">All Categories</option>
-            {categories.map((c) => (
-              <option key={c}>{c}</option>
-            ))}
+            {categories.map(c => <option key={c}>{c}</option>)}
           </select>
 
         </div>
 
-        {/* ADD PRODUCT */}
-        <ProductForm onAdd={addProduct} />
-
-        {/* CONTENT */}
-        {loading ? (
-          <div className="text-center py-10">Loading...</div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-10 text-gray-500">
-            No products found 
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        )}
+        {/* TABLE */}
+        <ProductTable
+          products={products}
+          onDelete={deleteProduct}
+          onEdit={(p) => setEditProduct(p)}
+          loading={loading}
+        />
 
       </div>
+
+      {/* EDIT MODAL */}
+      {editProduct && (
+        <EditModal
+          product={editProduct}
+          onClose={() => setEditProduct(null)}
+          onSave={updateProduct}
+        />
+      )}
+
     </div>
   );
 };

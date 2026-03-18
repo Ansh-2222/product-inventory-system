@@ -21,29 +21,14 @@ const ProductForm = ({ onAdd }: ProductFormProps) => {
     description: "",
   });
 
-  const [errors, setErrors] = useState<any>({});
-
-  const validate = () => {
-    let newErrors: any = {};
-
-    if (!form.name) newErrors.name = "Product name required";
-    if (!form.category) newErrors.category = "Category required";
-    if (!form.price) newErrors.price = "Price required";
-    if (!form.quantity) newErrors.quantity = "Quantity required";
-
-    if (Number(form.price) < 0)
-      newErrors.price = "Price cannot be negative";
-
-    if (Number(form.quantity) < 0)
-      newErrors.quantity = "Quantity cannot be negative";
-
-    setErrors(newErrors);
-
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = () => {
-    if (!validate()) return;
+    if (!form.name || !form.category || !form.price || !form.quantity) {
+      return alert("All fields required");
+    }
+
+    if (Number(form.price) < 0 || Number(form.quantity) < 0) {
+      return alert("Invalid values");
+    }
 
     onAdd({
       ...form,
@@ -58,8 +43,6 @@ const ProductForm = ({ onAdd }: ProductFormProps) => {
       quantity: "",
       description: "",
     });
-
-    setErrors({});
   };
 
   return (
@@ -69,92 +52,91 @@ const ProductForm = ({ onAdd }: ProductFormProps) => {
         Add Product
       </h2>
 
-      <div className="grid md:grid-cols-5 gap-3">
+      {/* GRID */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
 
-        {/* Name */}
+        {/* NAME */}
         <div className="flex flex-col">
+          <label className="text-xs text-gray-500 mb-1">
+            Product Name
+          </label>
           <input
-            placeholder="Product Name"
+            placeholder="Enter product name"
             value={form.name}
             onChange={(e)=>setForm({...form,name:e.target.value})}
-            className="border p-2 rounded outline-none focus:ring-2 focus:ring-blue-400"
+            className="border p-2 rounded focus:ring-2 focus:ring-blue-400 outline-none"
           />
-          {errors.name && (
-            <span className="text-red-500 text-xs mt-1">
-              {errors.name}
-            </span>
-          )}
         </div>
 
-        {/* Category */}
+        {/* CATEGORY */}
         <div className="flex flex-col">
+          <label className="text-xs text-gray-500 mb-1">
+            Category
+          </label>
           <select
             value={form.category}
             onChange={(e)=>setForm({...form,category:e.target.value})}
             className="border p-2 rounded focus:ring-2 focus:ring-blue-400"
           >
-            <option value="">Category</option>
-            {categories.map((c) => (
-              <option key={c}>{c}</option>
-            ))}
+            <option value="">Select category</option>
+            {categories.map(c => <option key={c}>{c}</option>)}
           </select>
-          {errors.category && (
-            <span className="text-red-500 text-xs mt-1">
-              {errors.category}
-            </span>
-          )}
         </div>
 
-        {/* Price */}
+        {/* PRICE */}
         <div className="flex flex-col">
+          <label className="text-xs text-gray-500 mb-1">
+            Price (₹)
+          </label>
           <input
             type="number"
             min="0"
-            placeholder="Price"
+            placeholder="Enter price"
             value={form.price}
             onChange={(e)=>setForm({...form,price:e.target.value})}
             className="border p-2 rounded focus:ring-2 focus:ring-blue-400"
           />
-          {errors.price && (
-            <span className="text-red-500 text-xs mt-1">
-              {errors.price}
-            </span>
-          )}
         </div>
 
-        {/* Quantity */}
+        {/* QUANTITY */}
         <div className="flex flex-col">
+          <label className="text-xs text-gray-500 mb-1">
+            Quantity
+          </label>
           <input
             type="number"
             min="0"
-            placeholder="Quantity"
+            placeholder="Enter quantity"
             value={form.quantity}
             onChange={(e)=>setForm({...form,quantity:e.target.value})}
             className="border p-2 rounded focus:ring-2 focus:ring-blue-400"
           />
-          {errors.quantity && (
-            <span className="text-red-500 text-xs mt-1">
-              {errors.quantity}
-            </span>
-          )}
         </div>
 
-        {/* Button */}
-        <button
-          onClick={handleSubmit}
-          className="bg-blue-600 text-white rounded px-4 hover:bg-blue-700 transition"
-        >
-          Add
-        </button>
+        {/* BUTTON */}
+        <div className="flex items-end">
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700 transition"
+          >
+            Add Product
+          </button>
+        </div>
+
       </div>
 
-      {/* Description */}
-      <textarea
-        placeholder="Description"
-        value={form.description}
-        onChange={(e)=>setForm({...form,description:e.target.value})}
-        className="border p-2 mt-3 w-full rounded focus:ring-2 focus:ring-blue-400"
-      />
+      {/* DESCRIPTION */}
+      <div className="mt-4">
+        <label className="text-xs text-gray-500 mb-1 block">
+          Description
+        </label>
+        <textarea
+          placeholder="Enter product description (e.g. high quality material, durable, etc.)"
+          value={form.description}
+          onChange={(e)=>setForm({...form,description:e.target.value})}
+          className="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
 
     </div>
   );

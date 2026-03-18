@@ -1,4 +1,6 @@
 // src/components/ProductTable.tsx
+import { Eye, Pencil, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 type Product = {
   id: string;
@@ -6,6 +8,7 @@ type Product = {
   category: string;
   price: number;
   quantity: number;
+  description?: string; // ✅ FIX
 };
 
 type Props = {
@@ -16,15 +19,12 @@ type Props = {
 };
 
 const ProductTable = ({ products, onDelete, onEdit, loading }: Props) => {
-  const handleDelete = (id: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
-    onDelete(id);
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="bg-white shadow rounded-xl overflow-x-auto">
 
-      <table className="w-full text-sm">
+      <table className="w-full text-sm min-w-[600px]">
 
         <thead className="bg-gray-100">
           <tr>
@@ -39,74 +39,45 @@ const ProductTable = ({ products, onDelete, onEdit, loading }: Props) => {
 
         <tbody>
 
-          {/* LOADING */}
           {loading ? (
             <tr>
-              <td colSpan={6} className="text-center py-6">
-                Loading...
-              </td>
+              <td colSpan={6} className="text-center py-6">Loading...</td>
             </tr>
           ) : products.length === 0 ? (
             <tr>
-              <td colSpan={6} className="text-center py-6 text-gray-500">
-                No products found 
-              </td>
+              <td colSpan={6} className="text-center py-6">No products</td>
             </tr>
           ) : (
             products.map((p) => (
-              <tr
-                key={p.id}
-                className="border-t hover:bg-gray-50 transition"
-              >
+              <tr key={p.id} className="border-t hover:bg-gray-50">
 
-                {/* NAME */}
-                <td className="p-3 font-medium text-gray-800">
-                  {p.name}
-                </td>
+                <td className="p-3">{p.name}</td>
+                <td className="p-3 text-center">{p.category}</td>
+                <td className="p-3 text-center">₹{p.price}</td>
+                <td className="p-3 text-center">{p.quantity}</td>
 
-                {/* CATEGORY */}
-                <td className="p-3 text-center text-gray-600">
-                  {p.category}
-                </td>
-
-                {/* PRICE */}
-                <td className="p-3 text-center font-medium">
-                  ₹{p.price}
-                </td>
-
-                {/* QUANTITY */}
                 <td className="p-3 text-center">
-                  {p.quantity}
-                </td>
-
-                {/* STATUS */}
-                <td className="p-3 text-center">
-                  <span
-                    className={`px-2 py-1 rounded text-xs ${
-                      p.quantity === 0
-                        ? "bg-red-100 text-red-600"
-                        : "bg-green-100 text-green-600"
-                    }`}
-                  >
-                    {p.quantity === 0 ? "Out of Stock" : "In Stock"}
+                  <span className={`px-2 py-1 text-xs rounded ${
+                    p.quantity < 10
+                      ? "bg-red-100 text-red-600"
+                      : "bg-green-100 text-green-600"
+                  }`}>
+                    {p.quantity < 10 ? "Low Stock" : "In Stock"}
                   </span>
                 </td>
 
-                {/* ACTIONS */}
-                <td className="p-3 flex gap-2 justify-center">
+                <td className="p-3 flex justify-center gap-3">
 
-                  <button
-                    onClick={() => onEdit(p)}
-                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                  >
-                    Edit
+                  <button onClick={() => navigate(`/product/${p.id}`)}>
+                    <Eye size={18} />
                   </button>
 
-                  <button
-                    onClick={() => handleDelete(p.id)}
-                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                  >
-                    Delete
+                  <button onClick={() => onEdit(p)}>
+                    <Pencil size={18} className="text-blue-600" />
+                  </button>
+
+                  <button onClick={() => onDelete(p.id)}>
+                    <Trash2 size={18} className="text-red-500" />
                   </button>
 
                 </td>

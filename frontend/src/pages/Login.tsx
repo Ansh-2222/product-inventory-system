@@ -25,7 +25,7 @@ const Login = () => {
 
       toast.success("Login successful ");
 
-      navigate("/dashboard"); // better flow
+      navigate("/dashboard");
 
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Login failed");
@@ -68,13 +68,21 @@ const Login = () => {
           <button
             onClick={handleLogin}
             disabled={btnLoading}
-            className={`w-full py-3 rounded-lg text-white transition ${
+            className={`w-full py-3 rounded-lg text-white flex justify-center items-center gap-2 transition ${
               btnLoading
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
-            {btnLoading ? "Logging in..." : "Login"}
+            {btnLoading ? (
+              <>
+                {/* Spinner */}
+                <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                Logging in...
+              </>
+            ) : (
+              "Login"
+            )}
           </button>
 
           {/* LINK */}

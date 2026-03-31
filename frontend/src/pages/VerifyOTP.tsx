@@ -6,17 +6,20 @@ import toast from "react-hot-toast";
 const VerifyOTP = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const email = location.state?.email;
+
+    const form = location.state?.form; 
+    const email = form?.email;
 
     const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
+    const [btnLoading, setBtnLoading] = useState(false);
+
     const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
-    //  redirect if no email
     useEffect(() => {
-        if (!email) {
+        if (!form) {
             navigate("/register");
         }
-    }, [email]);
+    }, [form]);
 
     const handleChange = (value: string, index: number) => {
         if (!/^[0-9]?$/.test(value)) return;
@@ -43,7 +46,7 @@ const VerifyOTP = () => {
     };
 
     const handleChangeEmail = () => {
-        navigate("/register");
+        navigate("/register", { state: { form } });
     };
 
     const handleVerify = async () => {
@@ -54,19 +57,21 @@ const VerifyOTP = () => {
         }
 
         try {
+            setBtnLoading(true);
+
             await API.post("/auth/verify-otp", {
                 email,
                 otp: finalOtp,
             });
 
-            toast.success("Account verified ");
-
-            // removed localStorage cleanup
+            toast.success("Account verified successfully ");
 
             navigate("/login");
 
         } catch {
             toast.error("Invalid OTP");
+        } finally {
+            setBtnLoading(false);
         }
     };
 
@@ -83,8 +88,8 @@ const VerifyOTP = () => {
                     OTP sent to <b>{email}</b>
                 </p>
 
+                {/* OTP BOXES */}
                 <div className="flex justify-center gap-3 mb-6">
-
                     {otp.map((digit, i) => (
                         <input
                             key={i}
@@ -99,16 +104,29 @@ const VerifyOTP = () => {
                             className="w-12 h-12 text-center text-lg border-b-2 border-gray-400 focus:border-black outline-none"
                         />
                     ))}
-
                 </div>
 
+                {/* VERIFY BUTTON */}
                 <button
                     onClick={handleVerify}
-                    className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800"
+                    disabled={btnLoading}
+                    className={`w-full py-3 rounded-lg text-white flex justify-center items-center gap-2 ${
+                        btnLoading
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-black hover:bg-gray-800"
+                    }`}
                 >
-                    Enter the Experience
+                    {btnLoading ? (
+                        <>
+                            <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                            Verifying...
+                        </>
+                    ) : (
+                        "Enter the Experience"
+                    )}
                 </button>
 
+                {/* CHANGE EMAIL */}
                 <p
                     onClick={handleChangeEmail}
                     className="text-sm text-gray-400 mt-4 cursor-pointer hover:text-black"

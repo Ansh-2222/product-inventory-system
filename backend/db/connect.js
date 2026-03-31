@@ -8,15 +8,15 @@ const isProduction = process.env.NODE_ENV === "production";
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: isProduction
-    ? { rejectUnauthorized: false } // ✅ Render
-    : false, // ❌ Local
+    ? { rejectUnauthorized: false } 
+    : false,  
 });
 
 // INIT DB
 const initDB = async () => {
   try {
     const client = await pool.connect();
-    console.log("PostgreSQL Connected ✅");
+    console.log("PostgreSQL Connected ");
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -44,11 +44,11 @@ const initDB = async () => {
       );
     `);
 
-    console.log("Tables ready ✅");
+    console.log("Tables ready ");
 
     client.release();
   } catch (err) {
-    console.error("DB INIT ERROR ❌", err);
+    console.error("DB INIT ERROR ", err);
   }
 };
 
